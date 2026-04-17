@@ -1,48 +1,77 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { useCart } from '../context/CartContext';
-import './Navbar.css';
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
+import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
-  const { items } = useCart();
+  const { items, clearCart } = useCart();
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    clearCart();
     logout();
-    navigate('/');
-  };
-
-  const navItemStyles = {
-    color: 'var(--color-text-primary)',
-    marginLeft: '1.5rem',
-    fontWeight: 500,
+    navigate("/");
   };
 
   return (
-    <nav className="navbar glass-panel">
-      <div className="container nav-content">
-        <Link to="/" className="nav-brand text-gradient">
-          EVERYTHING MARKET
+    <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center mx-auto px-4">
+        <Link to="/" className="mr-8 flex items-center space-x-2">
+          <span className="font-bold sm:inline-block text-primary">
+            ONLINE MARKETPLACE
+          </span>
         </Link>
-        <div className="nav-links">
-          <Link to="/products" style={navItemStyles}>Explore</Link>
+        <div className="flex flex-1 items-center justify-end space-x-4">
+          <Link
+            to="/products"
+            className="text-sm font-medium transition-colors hover:text-primary"
+          >
+            <Button variant="link">Explore</Button>
+          </Link>
           {user ? (
             <>
-              <Link to="/orders" style={navItemStyles}>Orders</Link>
-              <button onClick={handleLogout} className="btn-logout" style={{...navItemStyles, background:'none', border:'none', cursor:'pointer'}}>
+              <Link
+                to="/orders"
+                className="text-sm font-medium transition-colors hover:text-primary"
+              >
+                <Button variant="link">Orders</Button>
+              </Link>
+              <Button variant="link" onClick={handleLogout}>
                 Logout
-              </button>
+              </Button>
+              <Link to="/cart">
+                <Button
+                  variant="outline"
+                  className="rounded-full shadow-sm flex items-center gap-2 hover:border-primary/50 group transition-all"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-muted-foreground group-hover:scale-110 group-hover:text-primary transition-all"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                  {items.length > 0 && (
+                    <span className="font-semibold text-foreground">
+                      {items.length}
+                    </span>
+                  )}
+                </Button>
+              </Link>
             </>
           ) : (
-            <>
-              <Link to="/login" style={navItemStyles}>Login</Link>
-              <Link to="/register" style={navItemStyles} className="btn-primary-small">Sign Up</Link>
-            </>
+            <Link to="/login">
+              <Button variant="link">Sign In</Button>
+            </Link>
           )}
-          <div className="cart-indicator" style={navItemStyles}>
-            Cart ({items.length})
-          </div>
         </div>
       </div>
     </nav>

@@ -2,6 +2,10 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -22,7 +26,7 @@ const Login = () => {
         email, password
       });
       login(response.token, response.user);
-      navigate('/products');
+      navigate('/');
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {
@@ -31,39 +35,48 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-container animate-enter">
-      <div className="glass-panel" style={{ padding: '2.5rem', width: '100%', maxWidth: '400px' }}>
-        <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Welcome Back</h2>
-        {error && <div style={{ color: 'var(--color-danger)', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Email</label>
-            <input 
-              type="email" 
-              className="input-field" 
-              value={email} 
-              onChange={e => setEmail(e.target.value)} 
-              required 
-            />
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Password</label>
-            <input 
-              type="password" 
-              className="input-field" 
-              value={password} 
-              onChange={e => setPassword(e.target.value)} 
-              required 
-            />
-          </div>
-          <button type="submit" className="btn-primary" disabled={loading} style={{ marginTop: '1rem' }}>
-            {loading ? 'Logging in...' : 'Log In'}
-          </button>
-        </form>
-        <p style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
-          Don't have an account? <Link to="/register">Sign up</Link>
-        </p>
-      </div>
+    <div className="min-h-[80vh] flex items-center justify-center p-4">
+      <Card className="w-full max-w-md border-border/50">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl text-center font-bold">Welcome Back</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {error && <div className="text-destructive mb-4 text-sm text-center">{error}</div>}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input 
+                id="email"
+                type="email" 
+                value={email} 
+                onChange={e => setEmail(e.target.value)} 
+                required 
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input 
+                id="password"
+                type="password" 
+                value={password} 
+                onChange={e => setPassword(e.target.value)} 
+                required 
+              />
+            </div>
+            <Button type="submit" className="w-full mt-2" disabled={loading}>
+              {loading ? 'Logging in...' : 'Log In'}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col text-center mt-2 border-t pt-4">
+          <p className="text-sm text-muted-foreground">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-primary hover:underline font-medium">
+              Sign up
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
     </div>
   );
 };

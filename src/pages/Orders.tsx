@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Card } from "@/components/ui/card";
 
 interface Order {
   id: number;
@@ -30,7 +31,9 @@ const OrderCard = ({ order }: { order: Order }) => {
     if (!expanded && items.length === 0) {
       setLoadingItems(true);
       try {
-        const data = await api.get<OrderItem[]>(`/orders/${order.id}/order_items`);
+        const data = await api.get<OrderItem[]>(
+          `/orders/${order.id}/order_items`,
+        );
         setItems(data);
       } catch (err) {
         console.error("Failed to fetch order items", err);
@@ -41,66 +44,39 @@ const OrderCard = ({ order }: { order: Order }) => {
     setExpanded(!expanded);
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "delivered":
+        return "bg-green-500/10 text-green-600 dark:text-green-400";
+      case "shipped":
+        return "bg-orange-500/10 text-orange-600 dark:text-orange-400";
+      case "processing":
+        return "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400";
+      case "pending":
+      default:
+        return "bg-slate-500/10 text-slate-600 dark:text-slate-400";
+    }
+  };
+
   return (
-    <div className="glass-panel" style={{ overflow: "hidden" }}>
+    <Card className="overflow-hidden transition-all hover:border-primary/30">
       <button
         onClick={toggleExpand}
-        style={{
-          width: "100%",
-          background: "none",
-          border: "none",
-          textAlign: "left",
-          color: "inherit",
-          fontFamily: "inherit",
-          padding: "1.5rem",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: "1rem",
-          cursor: "pointer",
-        }}
+        className="w-full text-left bg-transparent border-none p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 cursor-pointer hover:bg-muted/30 transition-colors"
       >
         <div>
-          <h3 style={{ marginBottom: "0.25rem" }}>Order #{order.id}</h3>
-          <p
-            style={{
-              fontSize: "0.875rem",
-              color: "var(--color-text-secondary)",
-            }}
-          >
+          <h3 className="mb-1 text-lg font-semibold">Order #{order.id}</h3>
+          <p className="text-sm text-muted-foreground">
             {new Date(order.order_date).toLocaleDateString()} &middot;{" "}
             {order.items_count} items
           </p>
         </div>
-        <div style={{ textAlign: "right" }}>
-          <div
-            style={{
-              fontWeight: "bold",
-              fontSize: "1.25rem",
-              color: "var(--color-accent-primary)",
-            }}
-          >
+        <div className="text-left md:text-right">
+          <div className="font-bold text-xl text-primary">
             ${parseFloat(order.total_amount).toFixed(2)}
           </div>
           <div
-            style={{
-              display: "inline-block",
-              padding: "0.25rem 0.75rem",
-              borderRadius: "1rem",
-              fontSize: "0.75rem",
-              textTransform: "uppercase",
-              fontWeight: "bold",
-              background:
-                order.status === "delivered" || order.status === "completed"
-                  ? "rgba(0,255,100,0.1)"
-                  : "rgba(255,150,0,0.1)",
-              color:
-                order.status === "delivered" || order.status === "completed"
-                  ? "var(--color-success)"
-                  : "orange",
-              marginTop: "0.5rem",
-            }}
+            className={`mt-2 inline-block px-3 py-1 rounded-full text-xs uppercase font-bold ${getStatusColor(order.status)}`}
           >
             {order.status}
           </div>
@@ -108,34 +84,45 @@ const OrderCard = ({ order }: { order: Order }) => {
       </button>
 
       {expanded && (
-        <div style={{ padding: "0 1.5rem 1.5rem", borderTop: "1px solid var(--color-border-glass)" }}>
+        <div className="px-6 pb-6 pt-0 border-t border-border bg-muted/10">
           {loadingItems ? (
-            <div style={{ padding: "1rem 0", color: "var(--color-text-secondary)" }}>Loading items...</div>
+            <div className="py-4 text-muted-foreground animate-pulse text-sm">
+              Loading items...
+            </div>
           ) : items.length > 0 ? (
-            <div style={{ marginTop: "1rem" }}>
-              <h4 style={{ marginBottom: "0.75rem", color: "var(--color-text-secondary)" }}>Items Details</h4>
-              <ul style={{ listStyle: "none", padding: 0 }}>
+            <div className="mt-4">
+              <h4 className="mb-3 text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                Items Details
+              </h4>
+              <ul className="space-y-3">
                 {items.map((item) => (
-                  <li key={item.id} style={{ display: "flex", justifyContent: "space-between", padding: "0.5rem 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                  <li
+                    key={item.id}
+                    className="flex justify-between items-center py-2 border-b border-border/50 last:border-0"
+                  >
                     <div>
-                      <div style={{ fontWeight: 600 }}>{item.product_name}</div>
-                      <div style={{ fontSize: "0.875rem", color: "var(--color-text-secondary)" }}>
-                        Qty: {item.quantity} x ${parseFloat(item.unit_price).toFixed(2)}
+                      <div className="font-medium">{item.product_name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Qty: {item.quantity} &times; $
+                        {parseFloat(item.unit_price).toFixed(2)}
                       </div>
                     </div>
-                    <div style={{ fontWeight: "bold" }}>
-                      ${(item.quantity * parseFloat(item.unit_price)).toFixed(2)}
+                    <div className="font-semibold text-foreground">
+                      $
+                      {(item.quantity * parseFloat(item.unit_price)).toFixed(2)}
                     </div>
                   </li>
                 ))}
               </ul>
             </div>
           ) : (
-            <div style={{ padding: "1rem 0", color: "var(--color-text-secondary)" }}>No items found.</div>
+            <div className="py-4 text-muted-foreground text-sm">
+              No items found.
+            </div>
           )}
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 
@@ -166,38 +153,23 @@ const Orders = () => {
 
   if (loading)
     return (
-      <div
-        className="container"
-        style={{ padding: "4rem", textAlign: "center" }}
-      >
+      <div className="container mx-auto py-16 text-center text-muted-foreground animate-pulse">
         Loading orders...
       </div>
     );
 
   return (
-    <div
-      className="container animate-enter"
-      style={{ paddingTop: "3rem", paddingBottom: "3rem" }}
-    >
-      <h1 className="text-gradient" style={{ marginBottom: "2rem" }}>
+    <div className="container mx-auto py-12 px-4 md:px-6">
+      <h1 className="text-3xl font-bold tracking-tight text-primary mb-8">
         Order History
       </h1>
 
       {orders.length === 0 ? (
-        <div
-          className="glass-panel"
-          style={{
-            padding: "3rem",
-            textAlign: "center",
-            color: "var(--color-text-secondary)",
-          }}
-        >
+        <Card className="p-12 text-center text-muted-foreground">
           You have no orders yet. Start exploring our products!
-        </div>
+        </Card>
       ) : (
-        <div
-          style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
-        >
+        <div className="flex flex-col gap-6">
           {orders.map((order) => (
             <OrderCard key={order.id} order={order} />
           ))}

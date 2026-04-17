@@ -1,11 +1,19 @@
-import { Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
-import './ProductCard.css';
+import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface Product {
   id: number;
   name: string;
-  price: string; // usually strings in rails JSON based on decimal types
+  price: string;
   stock: number;
   description: string;
 }
@@ -19,28 +27,39 @@ const ProductCard = ({ product }: { product: Product }) => {
       productId: product.id,
       name: product.name,
       price: parseFloat(product.price),
-      quantity: 1
+      quantity: 1,
+    });
+
+    toast.success("Added to Cart", {
+      description: `${product.name} has been added to your cart.`,
     });
   };
 
   return (
-    <Link to={`/products/${product.id}`} className="product-card glass-panel">
-      <div className="product-content">
-        <h3 className="product-title">{product.name}</h3>
-        <p className="product-price">${parseFloat(product.price).toFixed(2)}</p>
-        <p className="product-stock">{product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}</p>
-      </div>
-      <div className="product-actions">
-        <button 
-          className="btn-primary" 
-          style={{ width: '100%' }}
-          onClick={handleAddToCart}
-          disabled={product.stock <= 0}
-        >
-          Add to Cart
-        </button>
-      </div>
-    </Link>
+    <Card className="flex flex-col h-full hover:border-primary/50 transition-colors">
+      <Link to={`/products/${product.id}`} className="flex flex-col flex-1">
+        <CardHeader>
+          <CardTitle className="text-xl line-clamp-2">{product.name}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1">
+          <p className="text-2xl font-bold text-primary mb-2">
+            ${parseFloat(product.price).toFixed(2)}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
+          </p>
+        </CardContent>
+        <CardFooter className="pt-4 border-t">
+          <Button
+            className="w-full"
+            onClick={handleAddToCart}
+            disabled={product.stock <= 0}
+          >
+            Add to Cart
+          </Button>
+        </CardFooter>
+      </Link>
+    </Card>
   );
 };
 
