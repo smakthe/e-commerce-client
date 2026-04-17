@@ -1,0 +1,38 @@
+.product-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  overflow: hidden;
+  position: relative;
+}
+
+.product-content {
+  padding: 1.5rem;
+  flex-grow: 1;
+}
+
+.product-title {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-primary);
+}
+
+.product-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-accent-primary);
+  margin-bottom: 0.5rem;
+}
+
+.product-stock {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.product-actions {
+  padding: 1rem 1.5rem;
+  background: rgba(0,0,0,0.2);
+  border-top: 1px solid var(--color-border-glass);
+}
