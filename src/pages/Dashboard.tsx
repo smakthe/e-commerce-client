@@ -80,8 +80,8 @@ const Dashboard = () => {
       {
         label: "Daily Spend ($)",
         data: stats.daily_spend.map((d) => parseFloat(d.amount)),
-        borderColor: "hsl(15, 75%, 59%)", // Anthropic primary
-        backgroundColor: "rgba(230, 113, 73, 0.2)", // Anthropic primary transparent
+        borderColor: "hsl(15, 75%, 59%)",
+        backgroundColor: "rgba(230, 113, 73, 0.2)",
         fill: true,
         tension: 0.4,
       },
@@ -122,7 +122,7 @@ const Dashboard = () => {
         data: statusLabels.map((s) => parseFloat(stats.status_distribution[s])),
         backgroundColor: statusLabels.map((s) => getStatusColor(s)),
         borderWidth: 1,
-        borderColor: "hsl(39, 26%, 84%)", // Anthropic background
+        borderColor: "hsl(39, 26%, 84%)",
       },
     ],
   };
