@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -21,6 +22,8 @@ const ProductDetails = () => {
   const [error, setError] = useState("");
 
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -48,6 +51,26 @@ const ProductDetails = () => {
         {error || "Product not found"}
       </div>
     );
+
+  const handleAddToCart = () => {
+    const item = {
+      productId: product.id,
+      name: product.name,
+      price: parseFloat(product.price),
+      quantity: 1,
+    };
+
+    if (!user) {
+      localStorage.setItem("pending_cart_item", JSON.stringify(item));
+      navigate("/login");
+      return;
+    }
+
+    addToCart(item);
+    toast.success("Added to Cart", {
+      description: `${product.name} has been added to your cart.`,
+    });
+  };
 
   return (
     <div className="container mx-auto py-12 px-4 md:px-6">
@@ -91,17 +114,7 @@ const ProductDetails = () => {
             size="lg"
             className="w-full md:w-auto h-12 px-8 text-lg"
             disabled={product.stock <= 0}
-            onClick={() => {
-              addToCart({
-                productId: product.id,
-                name: product.name,
-                price: parseFloat(product.price),
-                quantity: 1,
-              });
-              toast.success("Added to Cart", {
-                description: `${product.name} has been added to your cart.`,
-              });
-            }}
+            onClick={handleAddToCart}
           >
             Add to Cart
           </Button>

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
 
 interface Order {
   id: number;
@@ -160,9 +161,15 @@ const Orders = () => {
 
   return (
     <div className="container mx-auto py-12 px-4 md:px-6">
-      <h1 className="text-3xl font-bold tracking-tight text-primary mb-8">
-        Order History
-      </h1>
+      <div className="mb-8">
+        <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors mb-6 text-sm font-medium">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Dashboard
+        </Link>
+        <h1 className="text-3xl font-bold tracking-tight text-primary">
+          Order History
+        </h1>
+      </div>
 
       {orders.length === 0 ? (
         <Card className="p-12 text-center text-muted-foreground">

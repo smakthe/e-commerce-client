@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -78,7 +80,7 @@ const Dashboard = () => {
     labels: stats.daily_spend.map((d) => new Date(d.date).toLocaleDateString()),
     datasets: [
       {
-        label: "Daily Spend ($)",
+        label: "Spent($)",
         data: stats.daily_spend.map((d) => parseFloat(d.amount)),
         borderColor: "hsl(15, 75%, 59%)",
         backgroundColor: "rgba(230, 113, 73, 0.2)",
@@ -143,7 +145,7 @@ const Dashboard = () => {
         <Card className="border-border/50 bg-secondary/20">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Lifetime Value
+              Total Lifetime Order Value
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -195,7 +197,7 @@ const Dashboard = () => {
 
         <Card className="border-border/50 h-[400px]">
           <CardHeader>
-            <CardTitle>Spend by Status</CardTitle>
+            <CardTitle>Orders Status</CardTitle>
           </CardHeader>
           <CardContent className="h-[300px] flex items-center justify-center">
             {statusLabels.length > 0 ? (
@@ -217,7 +219,7 @@ const Dashboard = () => {
       {/* Top Products */}
       <Card className="border-border/50">
         <CardHeader>
-          <CardTitle>Top 5 Highest Volume Products</CardTitle>
+          <CardTitle>Most Purchased</CardTitle>
         </CardHeader>
         <CardContent>
           {stats.top_products.length > 0 ? (
@@ -228,13 +230,10 @@ const Dashboard = () => {
                   className="flex justify-between items-center py-2 border-b border-border/30 last:border-0"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="font-mono text-muted-foreground font-bold">
-                      {idx + 1}.
-                    </span>
-                    <span className="font-semibold">{p.product_name}</span>
+                    <span className="font-light">{p.product_name}</span>
                   </div>
                   <div className="text-sm text-foreground bg-secondary/50 px-3 py-1 rounded-full">
-                    {p.total_quantity} purchased
+                    {p.total_quantity}
                   </div>
                 </li>
               ))}
@@ -246,6 +245,23 @@ const Dashboard = () => {
           )}
         </CardContent>
       </Card>
+
+      <div className="mt-12 flex justify-center">
+        <Link to="/orders">
+          <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 rounded-full px-8 py-6 text-lg transition-all group">
+            View Complete Order History
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };

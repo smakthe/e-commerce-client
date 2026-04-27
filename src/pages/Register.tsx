@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import { api } from '../services/api';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -19,6 +21,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   
   const { login } = useAuth();
+  const { addToCart } = useCart();
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,7 +42,18 @@ const Register = () => {
         user: formData
       });
       login(response.token, response.user);
-      navigate('/');
+      
+      const pendingItemStr = localStorage.getItem('pending_cart_item');
+      if (pendingItemStr) {
+        const item = JSON.parse(pendingItemStr);
+        addToCart(item);
+        toast.success("Added to Cart", {
+          description: `${item.name} has been added to your cart.`
+        });
+        localStorage.removeItem('pending_cart_item');
+      }
+
+      navigate('/products');
     } catch (err: any) {
       setError(err.message || 'Registration failed');
     } finally {

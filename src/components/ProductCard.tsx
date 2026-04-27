@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import {
   Card,
   CardHeader,
@@ -20,15 +21,26 @@ interface Product {
 
 const ProductCard = ({ product }: { product: Product }) => {
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
-    addToCart({
+    
+    const item = {
       productId: product.id,
       name: product.name,
       price: parseFloat(product.price),
       quantity: 1,
-    });
+    };
+
+    if (!user) {
+      localStorage.setItem("pending_cart_item", JSON.stringify(item));
+      navigate("/login");
+      return;
+    }
+
+    addToCart(item);
 
     toast.success("Added to Cart", {
       description: `${product.name} has been added to your cart.`,

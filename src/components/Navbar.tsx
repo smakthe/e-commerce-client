@@ -5,11 +5,10 @@ import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
-  const { items, clearCart } = useCart();
+  const { items } = useCart();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    clearCart();
     logout();
     navigate("/");
   };
@@ -17,25 +16,19 @@ const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center mx-auto px-4">
-        <Link to="/" className="mr-8 flex items-center space-x-2">
+        <Link to={user ? "/products" : "/"} className="mr-8 flex items-center space-x-2">
           <span className="font-bold sm:inline-block text-primary">
             ONLINE MARKETPLACE
           </span>
         </Link>
         <div className="flex flex-1 items-center justify-end space-x-4">
-          <Link
-            to="/products"
-            className="text-sm font-medium transition-colors hover:text-primary"
-          >
-            <Button variant="link">Explore</Button>
-          </Link>
           {user ? (
             <>
               <Link
-                to="/orders"
+                to="/"
                 className="text-sm font-medium transition-colors hover:text-primary"
               >
-                <Button variant="link">Orders</Button>
+                <Button variant="link">Dashboard</Button>
               </Link>
               <Button variant="link" onClick={handleLogout}>
                 Logout
@@ -59,9 +52,9 @@ const Navbar = () => {
                       d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                     />
                   </svg>
-                  {items.length > 0 && (
+                  {items.reduce((sum, item) => sum + item.quantity, 0) > 0 && (
                     <span className="font-semibold text-foreground">
-                      {items.length}
+                      {items.reduce((sum, item) => sum + item.quantity, 0)}
                     </span>
                   )}
                 </Button>
