@@ -1,48 +1,59 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { useCart } from '../context/CartContext';
-import { api } from '../services/api';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
+import { api } from "../services/api";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   const { login } = useAuth();
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
-      const response = await api.post<{message: string, user: any, token: string}>('/auth/login', {
-        email, password
+      const response = await api.post<{
+        message: string;
+        user: any;
+        token: string;
+      }>("/auth/login", {
+        email,
+        password,
       });
       login(response.token, response.user);
-      
-      const pendingItemStr = localStorage.getItem('pending_cart_item');
+
+      const pendingItemStr = localStorage.getItem("pending_cart_item");
       if (pendingItemStr) {
         const item = JSON.parse(pendingItemStr);
         addToCart(item);
         toast.success("Added to Cart", {
-          description: `${item.name} has been added to your cart.`
+          description: `${item.name} has been added to your cart.`,
         });
-        localStorage.removeItem('pending_cart_item');
+        localStorage.removeItem("pending_cart_item");
       }
-      
-      navigate('/products');
+
+      navigate("/products");
     } catch (err: any) {
-      setError(err.message || 'Login failed');
+      setError(err.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -52,40 +63,49 @@ const Login = () => {
     <div className="min-h-[80vh] flex items-center justify-center p-4">
       <Card className="w-full max-w-md border-border/50">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center font-bold">Welcome Back</CardTitle>
+          <CardTitle className="text-2xl text-center font-bold">
+            Welcome Back
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          {error && <div className="text-destructive mb-4 text-sm text-center">{error}</div>}
+          {error && (
+            <div className="text-destructive mb-4 text-sm text-center">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input 
+              <Input
                 id="email"
-                type="email" 
-                value={email} 
-                onChange={e => setEmail(e.target.value)} 
-                required 
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input 
+              <Input
                 id="password"
-                type="password" 
-                value={password} 
-                onChange={e => setPassword(e.target.value)} 
-                required 
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
             <Button type="submit" className="w-full mt-2" disabled={loading}>
-              {loading ? 'Logging in...' : 'Log In'}
+              {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col text-center mt-2 border-t pt-4">
           <p className="text-sm text-muted-foreground">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-primary hover:underline font-medium">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="text-primary hover:underline font-medium"
+            >
               Sign up
             </Link>
           </p>

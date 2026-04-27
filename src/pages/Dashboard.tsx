@@ -4,6 +4,7 @@ import { api } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Spinner from "@/components/ui/spinner";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -61,8 +62,11 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-16 text-center text-muted-foreground animate-pulse">
-        Loading analytics...
+      <div className="flex flex-col items-center justify-center py-32 space-y-6 min-h-[60vh]">
+        <Spinner className="h-12 w-12 text-primary" />
+        <p className="text-muted-foreground animate-pulse font-medium tracking-wide">
+          Loading analytics...
+        </p>
       </div>
     );
   }

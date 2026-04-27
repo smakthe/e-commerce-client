@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
+import Spinner from "@/components/ui/spinner";
 
 interface Order {
   id: number;
@@ -154,8 +155,11 @@ const Orders = () => {
 
   if (loading)
     return (
-      <div className="container mx-auto py-16 text-center text-muted-foreground animate-pulse">
-        Loading orders...
+      <div className="flex flex-col items-center justify-center py-32 space-y-6 min-h-[60vh]">
+        <Spinner className="h-12 w-12 text-primary" />
+        <p className="text-muted-foreground animate-pulse font-medium tracking-wide">
+          Loading order history...
+        </p>
       </div>
     );
 

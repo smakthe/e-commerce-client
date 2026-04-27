@@ -1,4 +1,11 @@
-import { useEffect, useState, useRef, useCallback, lazy, Suspense } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  lazy,
+  Suspense,
+} from "react";
 import { useParams, Link } from "react-router-dom";
 import { api } from "../services/api";
 import { ArrowLeft } from "lucide-react";
@@ -28,7 +35,7 @@ const Collection = () => {
   const { id } = useParams<{ id: string }>();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Advanced Infinite Scroll State
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -47,7 +54,7 @@ const Collection = () => {
       });
       if (node) observer.current.observe(node);
     },
-    [loading, isFetchingMore, hasMore]
+    [loading, isFetchingMore, hasMore],
   );
 
   useEffect(() => {
@@ -56,7 +63,7 @@ const Collection = () => {
     setPage(0);
     setHasMore(true);
     // Scroll to the top of the page instantly when navigating to a new collection
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, behavior: "instant" });
   }, [id]);
 
   useEffect(() => {
@@ -67,15 +74,15 @@ const Collection = () => {
       try {
         const offset = page * 24;
         const data = await api.get<Product[]>(
-          `/products?collection=${id}&limit=24&offset=${offset}`
+          `/products?collection=${id}&limit=24&offset=${offset}`,
         );
 
         setHasMore(data.length === 24);
 
         setProducts((prev) => {
           if (page === 0) return data;
-          const newIds = new Set(data.map(d => d.id));
-          const filteredPrev = prev.filter(p => !newIds.has(p.id));
+          const newIds = new Set(data.map((d) => d.id));
+          const filteredPrev = prev.filter((p) => !newIds.has(p.id));
           return [...filteredPrev, ...data];
         });
       } catch (error) {
@@ -91,35 +98,44 @@ const Collection = () => {
 
   const getTitle = () => {
     switch (id) {
-      case 'best_selling': return "Best Sellers";
-      case 'maximum_revenue': return "Highest Grossing";
-      case 'newest_arrivals': return "Newest Arrivals";
-      default: return "Collection";
+      case "best_selling":
+        return "Best Sellers";
+      case "maximum_revenue":
+        return "Highest Grossing";
+      case "newest_arrivals":
+        return "Newest Arrivals";
+      default:
+        return "Collection";
     }
   };
 
   const getDescription = () => {
     switch (id) {
-      case 'best_selling': return "Our highest volume community favorites.";
-      case 'maximum_revenue': return "Powerhouse products moving substantial market volume.";
-      case 'newest_arrivals': return "Fresh drops and the latest additions to our catalog.";
-      default: return "Explore our curated collection.";
+      case "best_selling":
+        return "Our highest volume community favorites.";
+      case "maximum_revenue":
+        return "Powerhouse products moving substantial market volume.";
+      case "newest_arrivals":
+        return "Fresh drops and the latest additions to our catalog.";
+      default:
+        return "Explore our curated collection.";
     }
   };
 
   return (
     <div className="container mx-auto py-12 px-4 md:px-6 min-h-screen">
       <div className="mb-10">
-        <Link to="/products" className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors mb-6 text-sm font-medium">
+        <Link
+          to="/products"
+          className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors mb-6 text-sm font-medium"
+        >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Explore
+          Back to Marketplace
         </Link>
         <h1 className="text-4xl font-extrabold tracking-tight text-primary font-serif">
           {getTitle()}
         </h1>
-        <p className="text-muted-foreground mt-2">
-          {getDescription()}
-        </p>
+        <p className="text-muted-foreground mt-2">{getDescription()}</p>
       </div>
 
       {loading && page === 0 ? (
@@ -156,7 +172,7 @@ const Collection = () => {
                 No products found in this collection.
               </div>
             )}
-            
+
             {/* Seamless loading skeletons for the next infinite scroll batch */}
             {isFetchingMore && (
               <>

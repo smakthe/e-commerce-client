@@ -8,6 +8,7 @@ import {
 } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import Spinner from "@/components/ui/spinner";
 import { api } from "../services/api";
 import { Input } from "@/components/ui/input";
 
@@ -139,12 +140,10 @@ const Products = () => {
 
   const ProductCarousel = ({
     title,
-    description,
     products,
     collectionKey,
   }: {
     title: string;
-    description: string;
     products: Product[];
     collectionKey: string;
   }) => (
@@ -153,7 +152,6 @@ const Products = () => {
         <h2 className="text-2xl font-serif font-bold text-foreground">
           {title}
         </h2>
-        <p className="text-muted-foreground">{description}</p>
       </div>
       <div className="relative">
         <div
@@ -207,26 +205,7 @@ const Products = () => {
 
       {loading && page === 0 && search.trim() ? (
         <div className="flex flex-col items-center justify-center py-32 space-y-6">
-          <svg
-            className="animate-spin h-12 w-12 text-primary"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-20"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="3"
-            ></circle>
-            <path
-              className="opacity-80"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
+          <Spinner className="h-12 w-12 text-primary" />
           <p className="text-muted-foreground animate-pulse font-medium tracking-wide">
             Curating premium selection...
           </p>
@@ -279,7 +258,6 @@ const Products = () => {
           {exploreData.newest_arrivals?.length > 0 && (
             <ProductCarousel
               title="Newest Arrivals"
-              description="Fresh drops and the latest additions to our catalog."
               products={exploreData.newest_arrivals}
               collectionKey="newest_arrivals"
             />
@@ -287,7 +265,6 @@ const Products = () => {
           {exploreData.best_selling?.length > 0 && (
             <ProductCarousel
               title="Best Sellers"
-              description="Our highest volume community favorites."
               products={exploreData.best_selling}
               collectionKey="best_selling"
             />
@@ -295,7 +272,6 @@ const Products = () => {
           {exploreData.maximum_revenue?.length > 0 && (
             <ProductCarousel
               title="Highest Grossing"
-              description="Powerhouse products moving substantial market volume."
               products={exploreData.maximum_revenue}
               collectionKey="maximum_revenue"
             />
@@ -303,26 +279,7 @@ const Products = () => {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-32 space-y-6">
-          <svg
-            className="animate-spin h-12 w-12 text-primary"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-20"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="3"
-            ></circle>
-            <path
-              className="opacity-80"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
+          <Spinner className="h-12 w-12 text-primary" />
           <p className="text-muted-foreground animate-pulse font-medium tracking-wide">
             Loading explore dashboard...
           </p>
