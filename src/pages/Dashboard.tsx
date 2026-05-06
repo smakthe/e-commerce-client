@@ -33,10 +33,10 @@ ChartJS.register(
 
 interface Stats {
   total_orders: number;
-  total_amount: string;
-  average_order_value: string;
-  daily_spend: { date: string; amount: string }[];
-  status_distribution: Record<string, string>;
+  total_amount: string;           // BigDecimal serialized as string by Rails
+  average_order_value: number;   // Float — serialized as JSON number
+  daily_spend: { date: string; amount: string }[];  // BigDecimal → string
+  status_distribution: Record<string, number>;      // integer counts
   top_products: { product_name: string; total_quantity: number }[];
 }
 
@@ -125,7 +125,7 @@ const Dashboard = () => {
     labels: statusLabels,
     datasets: [
       {
-        data: statusLabels.map((s) => parseFloat(stats.status_distribution[s])),
+        data: statusLabels.map((s) => stats.status_distribution[s]),
         backgroundColor: statusLabels.map((s) => getStatusColor(s)),
         borderWidth: 1,
         borderColor: "hsl(39, 26%, 84%)",
@@ -176,7 +176,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">
-              ${parseFloat(stats.average_order_value).toFixed(2)}
+              ${stats.average_order_value.toFixed(2)}
             </div>
           </CardContent>
         </Card>

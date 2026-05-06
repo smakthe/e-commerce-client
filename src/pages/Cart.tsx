@@ -1,14 +1,53 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import { api } from "../services/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "sonner";
 
 const Cart = () => {
-  const { items, removeFromCart, updateQuantity, total } = useCart();
+  const { items, removeFromCart, updateQuantity, clearCart, total } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const SHIPPING_COST = items.length > 0 ? (total > 500 ? 0 : 25) : 0;
   const FINAL_TOTAL = total + SHIPPING_COST;
+
+  const handleCheckout = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    setIsCheckingOut(true);
+    try {
+      const result = await api.post<{ order_id: number; message: string }>(
+        "/checkout",
+        {
+          total_amount: FINAL_TOTAL,
+          items: items.map((item) => ({
+            product_id: item.productId,
+            quantity:   item.quantity,
+            unit_price: item.price,
+          })),
+        }
+      );
+
+      clearCart();
+      toast.success("Order placed!", {
+        description: `Order #${result.order_id} confirmed. Thank you for your purchase!`,
+      });
+      navigate("/orders");
+    } catch (err: any) {
+      toast.error("Checkout failed", {
+        description: err.message || "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -159,8 +198,12 @@ const Cart = () => {
                   </span>
                 </div>
 
-                <Button className="w-full h-14 text-lg rounded-full shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
-                  Proceed to Checkout
+                <Button
+                  className="w-full h-14 text-lg rounded-full shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform disabled:opacity-70 disabled:scale-100"
+                  onClick={handleCheckout}
+                  disabled={isCheckingOut}
+                >
+                  {isCheckingOut ? "Placing Order..." : "Proceed to Checkout"}
                 </Button>
 
                 <div className="mt-6 flex justify-center items-center gap-2 text-xs text-muted-foreground">

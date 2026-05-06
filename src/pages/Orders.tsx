@@ -131,10 +131,11 @@ const OrderCard = ({ order }: { order: Order }) => {
 const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (authLoading) return; // wait for token verification to complete
     if (!user) {
       navigate("/login");
       return;
@@ -151,7 +152,7 @@ const Orders = () => {
       }
     };
     fetchOrders();
-  }, [user, navigate]);
+  }, [user, navigate, authLoading]);
 
   if (loading)
     return (

@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { ReactNode } from 'react';
-import { useAuth } from './AuthContext';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import type { ReactNode } from "react";
+import { useAuth } from "./AuthContext";
 
 export interface CartItem {
   productId: number;
@@ -20,14 +20,18 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const CartProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const { user } = useAuth();
 
-  // Load and merge cart when user logs in
+  // Load and merge cart when user logs in including any pending_cart_item saved when an unauthenticated user clicked "Add to Cart"
   useEffect(() => {
     if (user) {
       const savedCart = localStorage.getItem(`cart_${user.id}`);
+      const pendingRaw = localStorage.getItem("pending_cart_item");
+
       let parsedCart: CartItem[] = [];
       if (savedCart) {
         try {
@@ -37,13 +41,32 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       }
 
+      let pendingItem: CartItem | null = null;
+      if (pendingRaw) {
+        try {
+          pendingItem = JSON.parse(pendingRaw) as CartItem;
+        } catch (e) {
+          console.error("Failed to parse pending cart item", e);
+        }
+        localStorage.removeItem("pending_cart_item");
+      }
+
       setItems((prev) => {
         const merged = [...parsedCart];
-        prev.forEach(pItem => {
-           const existing = merged.find(m => m.productId === pItem.productId);
-           if (existing) existing.quantity += pItem.quantity;
-           else merged.push(pItem);
+        // Merge any in-memory guest items (accumulated before login)
+        prev.forEach((pItem) => {
+          const existing = merged.find((m) => m.productId === pItem.productId);
+          if (existing) existing.quantity += pItem.quantity;
+          else merged.push(pItem);
         });
+        // Fulfill the pending single-item intent from pre-login "Add to Cart"
+        if (pendingItem) {
+          const existing = merged.find(
+            (m) => m.productId === pendingItem!.productId,
+          );
+          if (existing) existing.quantity += pendingItem.quantity;
+          else merged.push(pendingItem);
+        }
         localStorage.setItem(`cart_${user.id}`, JSON.stringify(merged));
         return merged;
       });
@@ -61,12 +84,14 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const addToCart = (newItem: CartItem) => {
     setItems((prev) => {
       let newItems;
-      const existing = prev.find((item) => item.productId === newItem.productId);
+      const existing = prev.find(
+        (item) => item.productId === newItem.productId,
+      );
       if (existing) {
-        newItems = prev.map((item) => 
-          item.productId === newItem.productId 
+        newItems = prev.map((item) =>
+          item.productId === newItem.productId
             ? { ...item, quantity: item.quantity + newItem.quantity }
-            : item
+            : item,
         );
       } else {
         newItems = [...prev, newItem];
@@ -82,7 +107,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return;
     }
     setItems((prev) => {
-      const newItems = prev.map((item) => item.productId === productId ? { ...item, quantity } : item);
+      const newItems = prev.map((item) =>
+        item.productId === productId ? { ...item, quantity } : item,
+      );
       saveCart(newItems);
       return newItems;
     });
@@ -103,10 +130,22 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const total = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
 
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, total }}>
+    <CartContext.Provider
+      value={{
+        items,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        total,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
@@ -115,7 +154,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export const useCart = () => {
   const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
+    throw new Error("useCart must be used within a CartProvider");
   }
   return context;
 };
