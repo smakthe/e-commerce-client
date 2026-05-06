@@ -1,3 +1,8 @@
+// Determine the base URL based on the environment.
+// In development (npm run dev), use '/api' to trigger your vite.config.ts proxy.
+// In production (Netlify), use the environment variable pointing to your OCI server.
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
+
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem('token');
   const headers = new Headers(options.headers || {});
@@ -7,7 +12,11 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     headers.set('Authorization', `Bearer ${token}`);
   }
 
-  const response = await fetch(`/api${endpoint}`, {
+  // Combine the BASE_URL with the endpoint. 
+  // Assuming 'endpoint' always starts with a slash (e.g., '/products/explore')
+  const url = `${BASE_URL}${endpoint}`;
+
+  const response = await fetch(url, {
     ...options,
     headers,
   });
