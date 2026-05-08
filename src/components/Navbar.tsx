@@ -22,7 +22,7 @@ const Navbar = () => {
           className="mr-8 flex items-center space-x-2"
         >
           <span className="font-bold sm:inline-block text-primary">
-            ONLINE MARKETPLACE
+            ECOMART MARKETPLACE
           </span>
         </Link>
         <div className="flex flex-1 items-center justify-end space-x-4">
